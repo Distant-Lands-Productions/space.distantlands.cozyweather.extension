@@ -89,9 +89,20 @@ jobs:
           rm .github/workflows/setup.yml
 
       - name: Commit and Push Changes
+        env:
+          GH_TOKEN: ${{ secrets.ORG_TEMPLATE_PAT }}
         run: |
+          NEW_REPO_NAME="space.distantlands.cozyweather.${{ steps.names.outputs.low_name }}"
+          OWNER="${{ github.repository_owner }}"
+          
+          # 1. Update git remote origin to point to the newly renamed repository URL
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${OWNER}/${NEW_REPO_NAME}.git"
+          
+          # 2. Configure bot author
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # 3. Add, commit, and push directly using the authenticated token URL
           git add .
           git commit -m "chore: initialize repository from template"
-          git push
+          git push origin HEAD:main
