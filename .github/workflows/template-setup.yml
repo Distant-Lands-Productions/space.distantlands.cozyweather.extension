@@ -1,0 +1,109 @@
+name: Template Setup
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  setup-template:
+    runs-on: ubuntu-latest
+    # Only run once per repository derived from template
+    if: github.run_number == 1
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get repository name and determine module name
+        id: get-name
+        run: |
+          # Extract the new repository name (e.g., "Blocks" from "space.distantlands.cozyweather.Blocks")
+          REPO_FULL_NAME="${{ github.event.repository.name }}"
+          
+          # Extract the module name (the last part after the last dot)
+          MODULE_NAME="${REPO_FULL_NAME##*.}"
+          
+          # Convert to different cases
+          MODULE_NAME_LOWER=$(echo "$MODULE_NAME" | tr '[:upper:]' '[:lower:]')
+          MODULE_NAME_UPPER=$(echo "$MODULE_NAME" | tr '[:lower:]' '[:upper:]')
+          
+          echo "repo_name=$REPO_FULL_NAME" >> $GITHUB_OUTPUT
+          echo "module_name=$MODULE_NAME" >> $GITHUB_OUTPUT
+          echo "module_name_lower=$MODULE_NAME_LOWER" >> $GITHUB_OUTPUT
+          echo "module_name_upper=$MODULE_NAME_UPPER" >> $GITHUB_OUTPUT
+          
+          echo "Repository name: $REPO_FULL_NAME"
+          echo "Module name: $MODULE_NAME"
+
+      - name: Check if this is a template-derived repository
+        id: check-template
+        run: |
+          REPO_NAME="${{ github.event.repository.name }}"
+          
+          # Only proceed if the repo name follows the expected pattern
+          if [[ "$REPO_NAME" == space.distantlands.cozyweather.* ]]; then
+            echo "is_template_derived=true" >> $GITHUB_OUTPUT
+            echo "Template-derived repository detected: $REPO_NAME"
+          else
+            echo "is_template_derived=false" >> $GITHUB_OUTPUT
+            echo "Not a template-derived repository, skipping setup"
+          fi
+
+      - name: Find and replace Extension/extension
+        if: steps.check-template.outputs.is_template_derived == 'true'
+        run: |
+          MODULE_NAME_UPPER="${{ steps.get-name.outputs.module_name_upper }}"
+          MODULE_NAME_LOWER="${{ steps.get-name.outputs.module_name_lower }}"
+          
+          echo "Replacing 'Extension' with '$MODULE_NAME_UPPER' and 'extension' with '$MODULE_NAME_LOWER'"
+          
+          # Replace in C# files
+          find . -type f -name "*.cs" ! -path "./.git/*" ! -path "./.github/*" -print0 | xargs -0 sed -i "s/Extension/$MODULE_NAME_UPPER/g"
+          find . -type f -name "*.cs" ! -path "./.git/*" ! -path "./.github/*" -print0 | xargs -0 sed -i "s/extension/$MODULE_NAME_LOWER/g"
+          
+          # Replace in JSON files
+          find . -type f -name "*.json" ! -path "./.git/*" ! -path "./.github/*" -print0 | xargs -0 sed -i "s/Extension/$MODULE_NAME_UPPER/g"
+          find . -type f -name "*.json" ! -path "./.git/*" ! -path "./.github/*" -print0 | xargs -0 sed -i "s/extension/$MODULE_NAME_LOWER/g"
+          
+          # Replace in ASMDEF files
+          find . -type f -name "*.asmdef" ! -path "./.git/*" ! -path "./.github/*" -print0 | xargs -0 sed -i "s/Extension/$MODULE_NAME_UPPER/g"
+          find . -type f -name "*.asmdef" ! -path "./.git/*" ! -path "./.github/*" -print0 | xargs -0 sed -i "s/extension/$MODULE_NAME_LOWER/g"
+          
+          # Replace in Markdown files
+          find . -type f -name "*.md" ! -path "./.git/*" ! -path "./.github/*" -print0 | xargs -0 sed -i "s/Extension/$MODULE_NAME_UPPER/g"
+          find . -type f -name "*.md" ! -path "./.git/*" ! -path "./.github/*" -print0 | xargs -0 sed -i "s/extension/$MODULE_NAME_LOWER/g"
+          
+          # Replace in Meta files
+          find . -type f -name "*.meta" ! -path "./.git/*" ! -path "./.github/*" -print0 | xargs -0 sed -i "s/Extension/$MODULE_NAME_UPPER/g"
+          find . -type f -name "*.meta" ! -path "./.git/*" ! -path "./.github/*" -print0 | xargs -0 sed -i "s/extension/$MODULE_NAME_LOWER/g"
+
+      - name: Commit and push changes
+        if: steps.check-template.outputs.is_template_derived == 'true'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          MODULE_NAME="${{ steps.get-name.outputs.module_name }}"
+          
+          git add -A
+          git commit -m "Initialize $MODULE_NAME module from template" || echo "No changes to commit"
+          git push
+
+      - name: Disable this workflow
+        if: steps.check-template.outputs.is_template_derived == 'true'
+        run: |
+          # Remove or comment out the trigger lines to prevent re-execution
+          sed -i 's/^on:/# on:/g' .github/workflows/template-setup.yml
+          sed -i 's/^  push:/  # push:/g' .github/workflows/template-setup.yml
+          sed -i 's/^  workflow_dispatch:/  # workflow_dispatch:/g' .github/workflows/template-setup.yml
+          
+          git add .github/workflows/template-setup.yml
+          git commit -m "Disable template setup workflow after initialization" || echo "No changes to commit"
+          git push
