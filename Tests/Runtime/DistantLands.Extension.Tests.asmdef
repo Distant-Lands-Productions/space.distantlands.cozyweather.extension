@@ -1,0 +1,11 @@
+{
+    "name": "DistantLands.Extension.Tests",
+    "references": [
+        "DistantLands.Extension"
+    ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": []
+}

@@ -1,0 +1,18 @@
+{
+	"name": "space.distantlands.cozyweather.extension",
+	"displayName":"COZY: Extension",
+	"version": "1.0.0",
+	"unity": "6000.5",
+	"unityRelease": "5f1",
+	"description": "Replace this with your own description of the package. \n\nFor best results, use this text to summarize: \n\u25AA What the package does \n\u25AA How it can benefit the user \n\nNote: Special formatting characters are supported, including line breaks ('\\n') and bullets ('\\u25AA').",
+	"dependencies": {
+		"com.unity.test-framework": "1.6.0"
+	},
+	"author": {
+		"name": "Distant Lands",
+		"url": "http://www.distantlands.space",
+		"email": "contact@distantlands.space"
+	},
+	"changelogUrl": "https://distant-lands.gitbook.io/cozy-weather-4/release-notes",
+	"documentationUrl": "https://distant-lands.gitbook.io/cozy-weather-4/"
+}
