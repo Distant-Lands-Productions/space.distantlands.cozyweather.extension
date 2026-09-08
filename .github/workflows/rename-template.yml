@@ -8,45 +8,43 @@ on:
 
 jobs:
   rename-project:
-    # Replace with your template's actual repo owner/name so it doesn't trigger on the template itself
-    if: github.repository != 'YOUR-GITHUB-USERNAME/YOUR-TEMPLATE-REPO-NAME'
+    # Only run if not the template repo AND if template setup hasn't completed yet
+    if: github.repository != 'DistantLandsProductions/space.distantlands.cozyweather.extension'
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      workflows: write
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Replace Placeholder Strings
+      - name: Check if already initialized
+        id: check_init
         run: |
-          # Raw repository name (e.g., "Blocks" or "blocks")
+          if [ -f ".template-initialized" ]; then
+            echo "already_run=true" >> $GITHUB_OUTPUT
+          else
+            echo "already_run=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Replace Placeholder Strings
+        if: steps.check_init.outputs.already_run == 'false'
+        run: |
           RAW_REPO_NAME="${{ github.event.repository.name }}"
-          
-          # Force lower-case repo name (e.g., "blocks")
           LOWER_REPO_NAME="$(echo "$RAW_REPO_NAME" | tr '[:upper:]' '[:lower:]')"
-          
-          # Force capitalized repo name (e.g., "Blocks")
           CAP_REPO_NAME="$(echo "${LOWER_REPO_NAME:0:1}" | tr '[:lower:]' '[:upper:]')${LOWER_REPO_NAME:1}"
-          
-          # Full package identifier (e.g., "space.distantlands.cozyweather.blocks")
           FULL_PACKAGE_ID="space.distantlands.cozyweather.${LOWER_REPO_NAME}"
 
-          echo "Replacing 'extension' -> ${LOWER_REPO_NAME}"
-          echo "Replacing 'Extension' -> ${CAP_REPO_NAME}"
-          echo "Replacing 'com.example.extension' -> ${FULL_PACKAGE_ID}"
-
-          # 1. Replace explicit package/domain placeholder if present
+          # Replace placeholders across files
           find . -type f -not -path '*/.git/*' -exec sed -i "s/com\.example\.extension/${FULL_PACKAGE_ID}/g" {} +
-
-          # 2. Replace capitalized "Extension" with "Blocks"
           find . -type f -not -path '*/.git/*' -exec sed -i "s/Extension/${CAP_REPO_NAME}/g" {} +
-
-          # 3. Replace lowercase "extension" with "blocks"
           find . -type f -not -path '*/.git/*' -exec sed -i "s/extension/${LOWER_REPO_NAME}/g" {} +
 
+          # Create initialization marker
+          touch .template-initialized
+
       - name: Commit and Push Changes
+        if: steps.check_init.outputs.already_run == 'false'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -56,9 +54,3 @@ jobs:
             git commit -m "chore: setup project from template replacing placeholders with repo name"
             git push
           fi
-
-      - name: Self-Destruct Workflow
-        run: |
-          git rm .github/workflows/rename-template.yml
-          git commit -m "chore: remove setup workflow"
-          git push
