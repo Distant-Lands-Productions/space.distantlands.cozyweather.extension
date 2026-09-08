@@ -44,6 +44,24 @@ jobs:
           gh repo rename "$NEW_NAME" --repo "${{ github.repository }}" --yes
         continue-on-error: true
 
+      - name: Rename and Make Repository Private
+        env:
+          GH_TOKEN: ${{ secrets.ORG_TEMPLATE_PAT }}
+        run: |
+          OLD_REPO="${{ github.repository }}"
+          NEW_NAME="space.distantlands.cozyweather.${{ steps.names.outputs.low_name }}"
+          
+          # 1. Rename the repository
+          gh repo rename "$NEW_NAME" --repo "$OLD_REPO" --yes
+          
+          # 2. Extract owner/org name and construct updated repo target
+          OWNER="${OLD_REPO%%/*}"
+          NEW_REPO="$OWNER/$NEW_NAME"
+          
+          # 3. Change visibility back to Private
+          gh repo edit "$NEW_REPO" --visibility private --accept-visibility-change-consequences
+        continue-on-error: true
+
       - name: Rename Files and Directories
         env:
           CAP_NAME: ${{ steps.names.outputs.cap_name }}
