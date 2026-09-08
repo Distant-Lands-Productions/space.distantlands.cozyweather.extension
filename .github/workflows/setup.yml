@@ -17,7 +17,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.ORG_TEMPLATE_PAT }}
+          token: ${{ secrets.ORG_TEMPLATE_PAT || secrets.GITHUB_TOKEN }}
 
       - name: Process Repository Names
         id: names
@@ -34,15 +34,6 @@ jobs:
           
           echo "cap_name=$CAP_NAME" >> $GITHUB_OUTPUT
           echo "low_name=$LOW_NAME" >> $GITHUB_OUTPUT
-
-      - name: Rename Repository
-        env:
-          GH_TOKEN: ${{ secrets.ORG_TEMPLATE_PAT }}
-        run: |
-          NEW_NAME="space.distantlands.cozyweather.${{ steps.names.outputs.low_name }}"
-          # Explicitly target current repository using github.repository context
-          gh repo rename "$NEW_NAME" --repo "${{ github.repository }}" --yes
-        continue-on-error: true
 
       - name: Rename and Make Repository Private
         env:
@@ -61,6 +52,19 @@ jobs:
           # 3. Change visibility back to Private
           gh repo edit "$NEW_REPO" --visibility private --accept-visibility-change-consequences
         continue-on-error: true
+
+      - name: Update package.json Description
+        env:
+          GH_TOKEN: ${{ secrets.ORG_TEMPLATE_PAT || secrets.GITHUB_TOKEN }}
+        run: |
+          # Fetch the repository description using GitHub CLI
+          REPO_DESC="$(gh repo view "${{ github.repository }}" --json description -q '.description')"
+
+          # Only update package.json if a description exists on GitHub
+          if [ -n "$REPO_DESC" ] && [ "$REPO_DESC" != "null" ] && [ -f "package.json" ]; then
+            # Update the description field in package.json using jq
+            jq --arg desc "$REPO_DESC" '.description = $desc' package.json > package.tmp.json && mv package.tmp.json package.json
+          fi
 
       - name: Rename Files and Directories
         env:
