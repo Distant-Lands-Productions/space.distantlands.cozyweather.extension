@@ -17,19 +17,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          # A Personal Access Token is required to rename the repository
-          token: ${{ secrets.ORG_TEMPLATE_PAT || secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.ORG_TEMPLATE_PAT }}
 
       - name: Process Repository Names
         id: names
         run: |
-          REPO_NAME="${{ github.event.repository.name }}"
-          
-          # Capitalize first letter (e.g., 'Blocks')
-          CAP_NAME="$(tr '[:lower:]' '[:upper:]' <<< ${REPO_NAME:0:1})${REPO_NAME:1}"
+          # Extract repository name cleanly from github.repository (e.g. "Distant-Lands-Productions/Blocks" -> "Blocks")
+          FULL_REPO="${{ github.repository }}"
+          REPO_NAME="${FULL_REPO##*/}"
           
           # All lowercase (e.g., 'blocks')
           LOW_NAME="$(echo "$REPO_NAME" | tr '[:upper:]' '[:lower:]')"
+
+          # Capitalize first letter (e.g., 'Blocks')
+          CAP_NAME="$(tr '[:lower:]' '[:upper:]' <<< ${LOW_NAME:0:1})${LOW_NAME:1}"
           
           echo "cap_name=$CAP_NAME" >> $GITHUB_OUTPUT
           echo "low_name=$LOW_NAME" >> $GITHUB_OUTPUT
@@ -39,8 +40,9 @@ jobs:
           GH_TOKEN: ${{ secrets.ORG_TEMPLATE_PAT }}
         run: |
           NEW_NAME="space.distantlands.cozyweather.${{ steps.names.outputs.low_name }}"
-          gh repo rename "$NEW_NAME" --yes
-        continue-on-error: true # If the PAT is missing, this fails gracefully but continues to rename files
+          # Explicitly target current repository using github.repository context
+          gh repo rename "$NEW_NAME" --repo "${{ github.repository }}" --yes
+        continue-on-error: true
 
       - name: Rename Files and Directories
         env:
@@ -56,7 +58,7 @@ jobs:
           CAP_NAME: ${{ steps.names.outputs.cap_name }}
           LOW_NAME: ${{ steps.names.outputs.low_name }}
         run: |
-          # grep -Il ignores binary files, protecting textures/models. It limits sed only to text files like JSON, ASMDEF, and C#.
+          # grep -Il ignores binary files. Limits sed only to text files like JSON, ASMDEF, and C#.
           find . -type f -not -path '*/\.git/*' -exec grep -Il 'Extension' {} + | xargs -r sed -i "s/Extension/$CAP_NAME/g"
           find . -type f -not -path '*/\.git/*' -exec grep -Il 'extension' {} + | xargs -r sed -i "s/extension/$LOW_NAME/g"
 
