@@ -13,7 +13,7 @@
         "Editor"
     ],
     "defineConstraints": [
-        "COZY_4_OR_NEWER"
+        "COZY_4_AND_UP"
     ],
     "excludePlatforms": []
 }

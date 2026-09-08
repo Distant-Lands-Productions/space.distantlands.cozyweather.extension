@@ -16,7 +16,8 @@
     ],
     "autoReferenced": false,
     "defineConstraints": [
-        "UNITY_INCLUDE_TESTS"
+        "UNITY_INCLUDE_TESTS",
+        "COZY_4_AND_UP"
     ],
     "versionDefines": [],
     "noEngineReferences": false

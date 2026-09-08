@@ -11,7 +11,7 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [
-        "COZY_4_OR_NEWER"
+        "COZY_4_AND_UP"
     ],
     "versionDefines": [],
     "noEngineReferences": false
