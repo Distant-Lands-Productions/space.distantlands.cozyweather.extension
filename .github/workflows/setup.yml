@@ -11,7 +11,7 @@ permissions:
 jobs:
   setup:
     # IMPORTANT: Prevent this from running in the template repository itself
-    if: ${{ github.repository != 'your-username/your-template-repo' }}
+    if: ${{ github.repository != 'Distant-Lands-Productions/space.distantlands.cozyweather.extension' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
