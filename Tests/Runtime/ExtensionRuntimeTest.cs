@@ -3,10 +3,10 @@ using UnityEngine.TestTools;
 using NUnit.Framework;
 using System.Collections;
 
-namespace EdgeProductions.Extension.Tests 
+namespace EdgeProductions.EXTENSION.Tests 
 {
 	
-	class ExtensionRuntimeTests
+	class EXTENSIONRuntimeTests
 	{
 
 		[Test]

@@ -5,7 +5,7 @@
 //
 // -----------------------------------------------------------------------------
 
-namespace EdgeProductions.Extension
+namespace EdgeProductions.EXTENSION
 {
     /// <summary>
     /// Provide a general description of the public class.

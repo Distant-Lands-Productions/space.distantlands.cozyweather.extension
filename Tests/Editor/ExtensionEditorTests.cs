@@ -4,10 +4,10 @@ using UnityEngine.TestTools;
 using NUnit.Framework;
 using System.Collections;
 
-namespace DistantLands.Extension.Editor.Tests 
+namespace DistantLands.EXTENSION.Editor.Tests 
 {
 	
-	class ExtensionEditorTests 
+	class EXTENSIONEditorTests 
 	{
 
 		[Test]
