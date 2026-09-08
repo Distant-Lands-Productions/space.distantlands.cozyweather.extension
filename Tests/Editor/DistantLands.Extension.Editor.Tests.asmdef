@@ -1,8 +1,8 @@
 {
-    "name": "DistantLands.EXTENSION.Editor.Tests",
+    "name": "DistantLands.Extension.Editor.Tests",
     "references": [
-        "DistantLands.EXTENSION.Editor",
-        "DistantLands.EXTENSION"
+        "DistantLands.Extension.Editor",
+        "DistantLands.Extension"
     ],
     "optionalUnityReferences": [
         "TestAssemblies"
