@@ -1,14 +1,10 @@
 {
-    "name": "DistantLands.Extension.Editor",
-    "rootNamespace": "DistantLands.Cozy.EditorScripts",
+    "name": "DistantLands.Cozy.Extension.Runtime",
+    "rootNamespace": "DistantLands.Cozy",
     "references": [
-        "GUID:569faf84544407f4a839eaab74f3516f",
-        "GUID:ea6fdb895ae7b9841894aa0594242006",
-        "GUID:5706c50feecb01b4cb045870dd1a027e"
+        "GUID:ea6fdb895ae7b9841894aa0594242006"
     ],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

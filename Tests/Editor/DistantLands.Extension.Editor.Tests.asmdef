@@ -2,13 +2,18 @@
     "name": "DistantLands.Extension.Editor.Tests",
     "references": [
         "DistantLands.Extension.Editor",
-        "DistantLands.Extension"
+        "DistantLands.Extension.Runtime",
+        "DistantLands.Cozy.Runtime",
+        "DistantLands.Cozy.Editor"
     ],
     "optionalUnityReferences": [
         "TestAssemblies"
     ],
     "includePlatforms": [
         "Editor"
+    ],
+    "defineConstraints": [
+        "COZY_4_OR_NEWER"
     ],
     "excludePlatforms": []
 }
