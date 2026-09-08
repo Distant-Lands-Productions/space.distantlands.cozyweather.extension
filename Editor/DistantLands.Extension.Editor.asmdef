@@ -1,7 +1,7 @@
 {
-    "name": "DistantLands.EXTENSION.Editor",
+    "name": "DistantLands.Extension.Editor",
     "references": [
-      "DistantLands.EXTENSION"
+      "DistantLands.Extension"
     ],
     "includePlatforms": [
         "Editor"
