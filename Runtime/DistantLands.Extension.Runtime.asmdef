@@ -2,7 +2,7 @@
     "name": "DistantLands.Cozy.Extension.Runtime",
     "rootNamespace": "DistantLands.Cozy",
     "references": [
-        "GUID:ea6fdb895ae7b9841894aa0594242006"
+        "DistantLands.Cozy.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
